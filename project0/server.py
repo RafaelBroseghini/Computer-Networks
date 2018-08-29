@@ -14,11 +14,14 @@ def main():
         with conn:
             print('Accepted connection from {}'.format(addr))
             while True:
+                # Receives 1024bytes of data maximum.
                 data = conn.recv(1024)
                 if not data:
                     print('Connection closed')
                     break
-                conn.sendall("Hello, Client".encode())
+                # Here we decode the name passed in as cmd line argument on the client side 
+                # and greet the user. 
+                conn.sendall("Hello, {}".format(data.decode()).encode())
 
 
 if __name__ == '__main__':

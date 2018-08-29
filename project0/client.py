@@ -10,7 +10,8 @@ def main(name: str):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((HOST, PORT))
         print('Connected to {}:{}'.format(HOST, PORT))
-        s.sendall("Hi, I'm {}".format(name).encode())
+        # This sends the name passed in as cmd line argument through the socket. (I assume)
+        s.sendall("{}".format(name).encode())
         data = s.recv(1024)
         print('Received: {}'.format(data.decode()))
         s.close()
