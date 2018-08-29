@@ -1,0 +1,72 @@
+Date: 08/29/2018
+-----------------
+OBJECTIVES:
+
+Review protocol layered model.
+Identify networking problems.
+-----------------
+
+We are the edge of the internet?
+    - Our machine.
+    - The server.
+
+Request to the server bounces through the cloud.
+Goes to the server, responds with the information
+that goes back through the cloud and reaches the computer.
+MILI
+MICRO
+NANO
+seconds. In the order of thousands.
+
+Performance is important, as we care about the most effective and 
+efficient way of designing a system.
+-------------
+
+What is the core of the internet?
+
+
+How many protocols are there?
+    - More than 100.
+    - Serve different purposes.
+    - Some sort of documetnation usually in the form of IRC.
+
+
+MODEL TCP/IP
+    - Probably the most important.
+
+TERMS:
+-------------
+HTTP            WEB
+NAT             Private address
+ROUTER          internet protocol
+TCP             3-way handshake
+UDP             Best-effort delivery
+
+Services
+-------------
+WEB
+    - HTTP (hyper text transfer protocol)
+
+VoIP
+    - Facetime.
+    - Skype
+    - Digitize data and transmit as a packet. (voice)
+
+EMAIL
+    - POP3
+    - IMAP (manipulate mail box)
+    - SMTP (send messages)
+
+HOST CONFIGURATION
+    - DHCP (gets information to the network; how should it connect to neighbors; are there any neighbors at all)
+
+NAME RESOLUTION
+    - DNS (names get resolved from human readbale names to computer readable ip addresses)
+
+TIME SYNCHRONIZATION
+    - NTP
+
+SIMPLE FILE TRANSER
+    - TFTP
+
+
