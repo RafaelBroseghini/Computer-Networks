@@ -10,6 +10,7 @@ def main():
         s.bind((HOST, PORT))
         s.listen(1)
         print('Listening on port {}'.format(PORT))
+        # Does this accept a connection from the client and binds to the host + port?
         conn, addr = s.accept()
         with conn:
             print('Accepted connection from {}'.format(addr))
@@ -20,7 +21,7 @@ def main():
                     print('Connection closed')
                     break
                 # Here we decode the name passed in as cmd line argument on the client side 
-                # and greet the user. 
+                # and send to the client.py to greet the user. 
                 conn.sendall("Hello, {}".format(data.decode()).encode())
 
 

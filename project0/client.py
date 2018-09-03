@@ -12,8 +12,10 @@ def main(name: str):
         print('Connected to {}:{}'.format(HOST, PORT))
         # This sends the name passed in as cmd line argument through the socket. (I assume)
         s.sendall("{}".format(name).encode())
+        # Below we receive data from the server greeting the user. Also 1024bytes.
         data = s.recv(1024)
         print('Received: {}'.format(data.decode()))
+        # Close the socket.
         s.close()
         print('Connection closed')
 
