@@ -1,0 +1,17 @@
+Date: 09/05/2018
+-----------------
+
+5 LAYER MODEL
+    - Sometimes dropped to 4 layer model when the physical layer is excluded altogether as part of another 
+    science.
+
+WIRESHARK
+    - ens33: eth0;
+    localloop back: local interface and not accessible from the outside world; the location of this 
+    interface is somewhere in between the network and transport layer.
+
+    We are able to apply filters before or after we have started wireshark.
+    Example: ip(protocol).addr(method?) == (comparison) other ip
+
+    Ethernet:
+        - 

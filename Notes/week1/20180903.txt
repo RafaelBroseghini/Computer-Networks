@@ -1,0 +1,110 @@
+Date: 09/03/2018
+-----------------
+
+WEP
+    - Wired equivalent privacy.
+
+Wired may be more controlled, there are ways to extract data.
+    - Speed bandwith is much faster tha wireless.
+
+
+ASDL/Cable/Fiber
+    - Fiber is the fastest but also most expensive.
+
+Ethernet
+    - Cat5
+    - Cat6
+
+802.11 (Wi-Fi)
+    - b/g/n/ac
+    - 802 is a standard. 11 means wifi. 16 is bluetooth.
+
+3G/4G/LTE/WiMax
+    - Very expensive to cover large countries such as the U.S
+
+Why do we need connection?
+    - pass
+
+ISP
+    - Internet Service Provider
+
+IXP
+    - Internet Exchange Point
+
+------------------------------------------------------------------------------------------------------
+
+PACKETS:
+    LAYERS:
+        Application
+        Transportation
+        Internet
+        Link
+        Physical
+
+    Application can produce large messages, that are often broken into small chunks.
+    That is the whole idea of the internet. Packet switching (message is broken into smaller pieces) vs Service switching. In the sixties
+    if we wanted to connect to other nodes that were already connected in a circuit, it was a problem.
+
+    The small chunks (packets). In most cases all the packets will take the same route.They are forwarded across muultiple links from source
+    to destination.
+    It is not a job for a router to reassemble the message. The reassemly is done at the destination, and it has not to 
+    do with encryption that routers can not assemble the message.
+
+    DELAYS:
+        - What causes delays?
+            - Distance.
+            - 
+    
+    PACKET LOSS:
+        - Not common nowadays.
+        
+    QUEUES & BUFFERS
+        - Build a queue and a backlog of packets as they arrive.
+
+    ROUTING
+        - Kind of a best route algorithm.
+
+
+    CDN
+        - Content Delivery Network
+
+
+
+Quality of Service
+    - From Source to next point limitations are distance (physics).
+    Processing delay (less than a microsecond); negligible. 
+        Reading and updating the packet.
+        Error checking.
+    
+    QUEIENG DELAY:
+        - The most challenging part of this process is the Queeing delay. Happens on devices between
+    source and destination as those devices might have queue of packets to process. Traffic is random. It comes
+    in bursts.
+
+    Packets can be flagged which nrings the challenge of ordering how they should be delivered and treated
+    as urgent by routers. Priority Queues? Yus. Some packets will be dropped. 
+        When is it ok for packets to be dropped?
+            Live videos; videos.
+        
+        How many packets can you drop in a tolerable manner?
+
+    TRASMISSION DELAY:
+        - How fast can it push the pakets into the wire?
+        (size of packet/width of your connection) = time in which it can be trasmitted.
+        Has to do with the output capacity of the device you are using.
+    
+    PROPAGATION DELAY:
+        - PHYSICS!! Has to do with the distance between two devices.
+
+
+
+
+
+
+
+    
+MY TAKEAWAYS:
+    - Internet is a suitable service to perform graphs algorithms.
+        - BFS; DFS; Djikstra;
+
+    - Is mobile network not connected to the internet?

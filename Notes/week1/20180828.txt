@@ -70,3 +70,12 @@ SIMPLE FILE TRANSER
     - TFTP
 
 
+WHAT IS THE INTERNET?
+    - A network of networks.
+    - Infrastrucure; Devices; Routers;
+
+WEB
+    - One of the services provided in the internet.
+    - Email is another service and not part of the Web. Although, there are web email.
+
+
