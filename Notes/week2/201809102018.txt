@@ -1,0 +1,27 @@
+Date: 09/10/2018
+================
+
+MAC address (Hardware address): Media Access Controller
+
+What happens when we boot the machine and surf to a web page from a network perspective?
+    - Network card. The basic thing that the machine knows about the environmet is its MAC address.
+    This address identifies the card within the local network.
+
+    - (DHCP) Machine broadcasts a message to the local network basically asking for its ip address.
+    At least one machine in the network responds to your broadcast. 
+    (port:68) And serves the ip address to the requester, dns srver, mask, gateway address.
+
+    - If no response comes back, your machine makes up an IP address (useless) (169.254....). Not a good
+    sign. Expected response from DHCP server but it never came back.
+
+    - At this point your machine knows how a lot about the network but maybe not the gateway's MAC address.
+    The machine uses the ARP protocol to find it. The gateway responds alone, not someone else. Because
+    if you have some machine that asks to another machine, the requested machine responds.
+
+    - Machine must resolve the name (url/uri) of the destination into computer readable content (numbers).
+    DNS server (Domain name system) may be out of the local network. If it is out it must go through the gateway.
+    When the response comes back, we finally know what is the specific address of our destination.
+
+    - 3 way handshake.
+
+    - GET request. Response with content. (There may be some redirections.)
