@@ -1,0 +1,33 @@
+Date: 09/14/2018
+================
+
+Application Layer Protocol Needs
+
+DNS:
+    - If my local DNS does not know how to resolve a name, it contacts a higher hierarchy server.
+    - Relies on the UDP protocol beacause often the server is local. Size of message is small and
+    it is a simple message.
+
+DNS flags:
+    - Type A: We want to get back the IPv4 of the destination. 32 bits. Roughly 4 billion addresses.
+    - Type AAAA: IPv6 - 128 bits. More than the numbers of atoms in the universe.
+    - Type MX: Mail exchange. See the email server we are using.
+    - Type NS: Name Server.
+
+Format of the message (DNS Message):
+    - Gets encapsulated inside a transport layer protocol.
+    - UDP gets attached to it (8 bits long)
+        - Port number is important: 53 (Official port number for DNS server.)
+        - Total number of ports: 2 bytes. 2^16. (1 byte == 8 bits)
+    - Protocol IP: Header -> Protocol:17(x11) = UDP
+    - Protocol IP: Header -> Protocol:06(x06) = TCP
+    - Ethernet Header: 
+        - Type: IPv4.
+
+HTTP: 
+    - Needs reliability.
+    - Identifies its TCP port: 80.
+    - Relies on the HTTP protocol as it may receive many objects (page, css, js etc)
+    - TCP is a way to establish connection. (3 way: want, yes I understand, ok connected)
+
+

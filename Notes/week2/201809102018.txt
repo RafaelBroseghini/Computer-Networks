@@ -22,6 +22,6 @@ What happens when we boot the machine and surf to a web page from a network pers
     DNS server (Domain name system) may be out of the local network. If it is out it must go through the gateway.
     When the response comes back, we finally know what is the specific address of our destination.
 
-    - 3 way handshake.
+    - 3 way handshake (Transport Layer Protocol)
 
     - GET request. Response with content. (There may be some redirections.)
