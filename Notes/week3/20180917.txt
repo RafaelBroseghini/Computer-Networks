@@ -1,0 +1,50 @@
+Date: 09/17/2018
+================
+
+Application Layer Protocol Needs
+    - Data integrity:
+        - Guaranteed delivery vs loss tolerance
+
+    - Timing:
+        - Small miliseconds is often negligible.
+        - Delay:
+            - time it takes for a packet to get from one
+            place to another. many variables that play into it.
+        - Jitter:
+            - Google this.
+
+    - Throughput:
+        - Guaranteed:
+            - Google this.
+        - Elastic:
+            - Google this.
+
+
+WEB HISTORY
+    - Early years:
+        - Text-based.
+
+    - Dotcom bubble:
+        - Broadcast
+        - Dotcomcities
+
+
+    - Survivors:
+        - Amazon
+        - eBay
+        - Google
+
+
+HTTP
+    - Stateless:
+        - It does not keep track of its state or any previous interaction.
+        - There is no memory expenditure.
+        - Any request is a new request.
+
+    - The way protocols are being used has changed. Over different layers.
+    - Difficult to change the Application and Transportation layer.
+
+    - Local Storage:
+        - Cookies
+        - Flask (GONE)
+        - 
