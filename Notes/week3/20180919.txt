@@ -1,0 +1,8 @@
+Date: 09/19/2018
+================
+
+HTTP RESPONSE STATUS CODE:
+    - 2XX Success
+    - 3XX Redirection
+    - 4XX Client Error
+    - 5XX Server Error
