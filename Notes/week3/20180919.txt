@@ -6,3 +6,56 @@ HTTP RESPONSE STATUS CODE:
     - 3XX Redirection
     - 4XX Client Error
     - 5XX Server Error
+
+FTP Details:
+    - Request/ Response protocol.
+    - Two parallel connections:
+        - Control (delete, put, get)
+        - Data (data itself)
+    
+    - Security:
+        - Plain text protocol
+        - No Security
+        - SFTP (secure, added encryption)
+    
+    - Stateful:
+        - Maintains a recod of the connections
+
+Email
+    - SMTP:
+        - Push protocol
+        - Commands
+        - Ports 25, 465, 587
+    
+    POP3:
+        - Pull Control
+        - Command/reply
+        - Ports 110, 995
+    
+    IMAP:
+        - Mailbox manipulation
+        - Ports 143, 220, 993
+
+
+DIRECTORY AND NAMING PROTOCOLS:
+    - DNS:
+        - Distributed Database
+        - Hierarchy
+        - Highly distributed system
+
+    - Root servers
+    - Authoritative DNS servers:
+        - Maintained by organization or service provider.
+    
+    - Name Resolution:
+        - Iterative and Recursive.
+        - Default is Iterative because we do not want to burn the top leve domain servers with requests.
+            plus there may be caching involved in the way.
+
+    - DNS CACHING:
+        - Cached entries may be poisoned by someone. May be out-of-date.
+    
+    - DNS RECORDS:
+        - A, NS, CNAME, MX
+
+    
