@@ -1,0 +1,41 @@
+Date: 09/21/2018
+================
+
+DNS PROJECT:
+    - Base conversion.
+        - When we reach base of conversion system minus 1, we switch to 10.
+        - oct (0,1,2,3,4,5,6,7,10,11,12,13,14,16,17,20)
+        - hex (0,1,2,3,4,5,6,7,8,9,a,b,c,d,e,f,10,11)
+
+        - Binary to decimal:
+            - when you have a power of two, look at the binary.
+            - power of two is a nice nnumber with lots of 0's.
+            - power of two -1  is a nice nnumber with lots of 1's.
+
+            - (2 -> base system, could be 8, 16 etc)^index + number at that index (reverse).
+        
+        - Decimal to binary:
+            - Keep dividing until you reach one.
+
+        - Binary to Hex: (2^4)
+            - how many digits to represent one bit in hex?
+            - split by the number of digits.
+            - only works if you convert to a number system that is a power of the source.
+
+        - How to add bin numbers?
+            - simple arithmetic.
+        
+        - How to represent negatives in bin?
+            - ones compliment.
+                - flip every bit (0->1 1->0)
+            - twos compliment.
+                - do ones compliment.
+                - add one to that number.
+
+        - extract two right most digits:
+            - do 
+        
+        - extract two first bits:
+            - get len, shift len - 2 to the right.
+            - make two first ones,rest zeros.
+            - source >> 
