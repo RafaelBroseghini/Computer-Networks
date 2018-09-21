@@ -33,9 +33,10 @@ DNS PROJECT:
                 - add one to that number.
 
         - extract two right most digits:
-            - do 
+            - do & operation.
+            - number of bits * 1 += newstring '0b....'
         
-        - extract two first bits:
+        - extract two leftmost bits:
             - get len, shift len - 2 to the right.
             - make two first ones,rest zeros.
             - source >> 
