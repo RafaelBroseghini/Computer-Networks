@@ -33,19 +33,48 @@ PUBLIC_DNS_SERVER = [
 
 def val_to_2_bytes(value: int) -> list:
     '''Split a value into 2 bytes'''
-    raise NotImplementedError
+    two_bytes = []
+    # 2^0 * 1
+    # &, shift right 8 and &.
+    shifter = bin(2**8-1)
+    for i in range(2):
+        result = value & int(shifter, 2)
+        value >>= 8
+        two_bytes.insert(0, result)
+    return two_bytes
 
 def val_to_n_bytes(value: int, n_bytes: int) -> list:
-    '''Split a value into n bytes'''
-    raise NotImplementedError
+    '''Split a value into 2 bytes'''
+    n_decimal = []
+    shifter = bin(2**8-1)
+    for i in range(n_bytes):
+        result = value & int(shifter, 2)
+        value >>= 8
+        n_decimal.insert(0, result)
+    return n_decimal
 
 def bytes_to_val(bytes_lst: list) -> int:
     '''Merge 2 bytes into a value'''
-    raise NotImplementedError
+    result = list(bytes_lst)
+    while len(result) > 1:
+        temp = []
+        # grab every two elements and merge.
+        for n in range(len(result)-1):
+            combined = result[n] << 8 | result[n+1]
+            temp.append(combined)
+        result = temp
+    return result[0]
 
-def get_2_bits(bytes: list) -> int:
+def get_2_bits(bytes_lst: list) -> int:
     '''Extract first two bits of a two-byte sequence'''
-    raise NotImplementedError
+    # shift right.
+    # combine.
+    result = []
+    for num in bytes_lst:
+        shifter = len(bin(num)) - 3
+        val = num >> shifter
+        result.append(val)
+    return result[0] << 1 | result[1]
 
 def get_offset(bytes: list) -> int:
     '''Extract size of the offset from a two-byte sequence'''
@@ -53,7 +82,18 @@ def get_offset(bytes: list) -> int:
 
 def parse_cli_query(filename, q_type, q_domain, q_server=None) -> tuple:
     '''Parse command-line query'''
-    raise NotImplementedError
+    # if q_type == "MX":
+    #     q_type = ValueError('Unknown query type')
+    # else:
+    #     q_type = DNS_TYPES[q_type]
+    q_type = DNS_TYPES[q_type]
+    q_domain = q_domain.split(".")
+    if not q_server:
+        q_server = choice(PUBLIC_DNS_SERVER)
+    
+
+    # print(type(q_type), q_domain, q_server)
+    return q_type, q_domain, q_server
 
 def format_query(q_type: int, q_domain: list) -> bytearray:
     '''Format DNS query'''
