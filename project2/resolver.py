@@ -4,7 +4,6 @@ import sys
 from random import randint, choice, seed
 from socket import socket, SOCK_DGRAM, AF_INET
 
-
 PORT = 53
 
 DNS_TYPES = {
@@ -33,22 +32,15 @@ PUBLIC_DNS_SERVER = [
 
 def val_to_2_bytes(value: int) -> list:
     '''Split a value into 2 bytes'''
-    two_bytes = []
-    # 2^0 * 1
-    # &, shift right 8 and &.
-    shifter = bin(2**8-1)
-    for i in range(2):
-        result = value & int(shifter, 2)
-        value >>= 8
-        two_bytes.insert(0, result)
-    return two_bytes
+    val_left = value >> 8 # shift right 8 bits.
+    val_right = value & 0xFF # get right most 8 bits.
+    return [val_left, val_right]
 
 def val_to_n_bytes(value: int, n_bytes: int) -> list:
     '''Split a value into 2 bytes'''
     n_decimal = []
-    shifter = bin(2**8-1)
     for i in range(n_bytes):
-        result = value & int(shifter, 2)
+        result = value & 0xFF
         value >>= 8
         n_decimal.insert(0, result)
     return n_decimal
@@ -82,22 +74,43 @@ def get_offset(bytes: list) -> int:
 
 def parse_cli_query(filename, q_type, q_domain, q_server=None) -> tuple:
     '''Parse command-line query'''
-    # if q_type == "MX":
-    #     q_type = ValueError('Unknown query type')
-    # else:
-    #     q_type = DNS_TYPES[q_type]
     q_type = DNS_TYPES[q_type]
     q_domain = q_domain.split(".")
     if not q_server:
         q_server = choice(PUBLIC_DNS_SERVER)
     
-
-    # print(type(q_type), q_domain, q_server)
+    print(parse_cli_query.__annotations__)
     return q_type, q_domain, q_server
 
 def format_query(q_type: int, q_domain: list) -> bytearray:
     '''Format DNS query'''
-    raise NotImplementedError
+    transaction_id = val_to_2_bytes(randint(0, 65535))
+    query = bytearray([transaction_id[0], transaction_id[1], 1, 0])
+
+    # Flags
+    flags = [1,0,0,0]
+    for n in flags:
+        res = val_to_2_bytes(n)
+        query.append(res[0])
+        query.append(res[1])
+    # Domain
+    for sub_domain in q_domain:
+        query.append(len(sub_domain))
+        for char in sub_domain:
+            query.append(ord(char))
+    query.append(0)
+
+    # Type
+    q_type = val_to_2_bytes(q_type)
+    query.append(q_type[0])
+    query.append(q_type[1])
+
+    # Class
+    query.append(0)
+    query.append(1)
+
+    print(query)
+    return # return query
 
 def send_request(q_message: bytearray, q_server: str) -> bytes:
     '''Contact the server'''
