@@ -74,12 +74,13 @@ def get_offset(bytes: list) -> int:
 
 def parse_cli_query(filename, q_type, q_domain, q_server=None) -> tuple:
     '''Parse command-line query'''
+    if q_type == "MX":
+        raise ValueError("Unknown query type")
     q_type = DNS_TYPES[q_type]
     q_domain = q_domain.split(".")
     if not q_server:
         q_server = choice(PUBLIC_DNS_SERVER)
     
-    print(parse_cli_query.__annotations__)
     return q_type, q_domain, q_server
 
 def format_query(q_type: int, q_domain: list) -> bytearray:
@@ -109,8 +110,7 @@ def format_query(q_type: int, q_domain: list) -> bytearray:
     query.append(0)
     query.append(1)
 
-    print(query)
-    return # return query
+    return query
 
 def send_request(q_message: bytearray, q_server: str) -> bytes:
     '''Contact the server'''
@@ -131,11 +131,20 @@ def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
 
 def parse_address_a(addr_len: int, addr_bytes: bytes) -> str:
     '''Extract IPv4 address'''
-    raise NotImplementedError
+    return ".".join([str(addr_bytes[sub]) for sub in range(addr_len)])
 
 def parse_address_aaaa(addr_len: int, addr_bytes: bytes) -> str:
     '''Extract IPv6 address'''
-    raise NotImplementedError
+    addr_bytes = bytearray([int(hex(elem),16) for elem in addr_bytes])
+
+    sub_parts = [addr_bytes.hex()[i:i+4] for i in range(0,len(addr_bytes.hex())-4,4)]
+    address = ""
+    for s in range(len(sub_parts)):
+        if sub_parts[s].startswith("000"):
+            sub_parts[s] = sub_parts[s].replace("000","")
+        address += sub_parts[s] + ":"
+
+    return address[:len(address)-1]
 
 def resolve(query: str) -> None:
     '''Resolve the query'''

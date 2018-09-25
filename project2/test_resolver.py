@@ -30,6 +30,8 @@ class TestResolver:
 
     def test_val_to_bytes(self):
         assert val_to_2_bytes(43043) == [168, 35]
+        assert val_to_2_bytes(1) == [0, 1]
+        assert val_to_2_bytes(43) == [0, 43]
         assert val_to_n_bytes(430430, 3) == [6, 145, 94]
 
     def test_bytes_to_val(self):
@@ -45,13 +47,13 @@ class TestResolver:
         assert parse_cli_query('resolver.py', 'A', 'luther.edu') == (1, ['luther', 'edu'], '8.26.56.26')
         assert parse_cli_query('resolver.py', 'A', 'luther.edu', '1.0.0.1') == (1, ['luther', 'edu'], '1.0.0.1')
         assert parse_cli_query('resolver.py', 'AAAA', 'luther.edu') == (28, ['luther', 'edu'], '8.8.4.4')
-        # with pytest.raises(ValueError) as excinfo:
-        #     parse_cli_query('resolver.py', 'MX', 'luther.edu')
-        # exception_msg = excinfo.value.args[0]
-        # assert exception_msg == 'Unknown query type'
+        with pytest.raises(ValueError) as excinfo:
+            parse_cli_query('resolver.py', 'MX', 'luther.edu')
+        exception_msg = excinfo.value.args[0]
+        assert exception_msg == 'Unknown query type'
 
-    # def test_format_query(self):
-    #     assert format_query(1, ['luther', 'edu']) == b'OB\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x06luther\x03edu\x00\x00\x01\x00\x01'
+    def test_format_query(self):
+        assert format_query(1, ['luther', 'edu'])[2:] == b'\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x06luther\x03edu\x00\x00\x01\x00\x01'
 
     # def test_parse_response(self):
     #     assert parse_response(b'\xc7D\x81\x80\x00\x01\x00\x01\x00\x00\x00\x00\x06luther\x03edu\x00\x00\x01\x00\x01\xc0\x0c\x00\x01\x00\x01\x00\x00\x01,\x00\x04\xae\x81\x19\xaa') == [('luther.edu', 300, '174.129.25.170')]
@@ -77,11 +79,11 @@ class TestResolver:
     #         ('yahoo.com', 1257, '2001:4998:58:1836:0:0:0:10')
     #     ]
 
-    # def test_parse_address_a(self):
-    #     assert parse_address_a(4, b'\xae\x81\x19\xaa') == '174.129.25.170'
+    def test_parse_address_a(self):
+        assert parse_address_a(4, b'\xae\x81\x19\xaa') == '174.129.25.170'
 
-    # def test_parse_address_aaaa(self):
-    #     assert parse_address_aaaa(16, b' \x01I\x98\x00\x0c\x10#\x00\x00\x00\x00\x00\x00\x00\x04\xc0') == '2001:4998:c:1023:0:0:0:4'
+    def test_parse_address_aaaa(self):
+        assert parse_address_aaaa(16, b' \x01I\x98\x00\x0c\x10#\x00\x00\x00\x00\x00\x00\x00\x04\xc0') == '2001:4998:c:1023:0:0:0:4'
 
 
 if __name__ == '__main__':
