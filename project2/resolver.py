@@ -123,10 +123,64 @@ def send_request(q_message: bytearray, q_server: str) -> bytes:
 
 def parse_response(resp_bytes: bytes):
     '''Parse server response'''
+    start_of_name, i = resp_bytes[12], 12
+    rr_ans = bytes_to_val([resp_bytes[6], resp_bytes[7]])
+    j = int(hex(start_of_name),16)
+    current = int(hex(start_of_name),16)
+    while current != 0:
+        i += j + 1
+        current = int(hex(resp_bytes[i]),16)
+        j = int(hex(resp_bytes[i]),16)
+    offset = i + 5
+    answers = parse_answers(resp_bytes, offset, rr_ans)
+
     raise NotImplementedError
 
 def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
     '''Parse DNS server answers'''
+    # loop over rr_ans
+    res = []
+    start_of_name, i, builder = resp_bytes[12], 12, 13
+    j = int(hex(start_of_name),16)
+    current = int(hex(start_of_name),16)
+    name = ""
+    while current != 0:
+        for m in range(j):
+            name += chr(int(hex(resp_bytes[builder]),16))
+            i += 1
+            builder += 1
+        name += "."
+        j = int(hex(resp_bytes[builder]),16)
+        current = int(hex(resp_bytes[builder]),16)
+        builder += 1
+    name = name[:len(name)-1]
+    ## ttl use offset
+    
+    ttl = bytes_to_val([resp_bytes[offset+6], resp_bytes[offset+7],resp_bytes[offset+8],resp_bytes[offset+9]])
+
+    
+
+    for i in range(rr_ans):
+        q_type = bytes_to_val([resp_bytes[offset+2], resp_bytes[offset+3]])
+        print(q_type)
+        length = bytes_to_val([resp_bytes[offset+10], resp_bytes[offset+11]])
+        print(length)
+        if q_type == 1:
+            ip = parse_address_a(length, resp_bytes[offset+12:offset+12+length])
+            offset += 16
+            info = (name, ttl, ip)
+        elif q_type == 28:
+            ip = parse_address_aaaa(length, resp_bytes[offset+12:offset+12+length])
+            print(ip)
+            info = (name, ttl, ip)
+            offset += 12 + length
+
+
+        res.append(info)
+    
+    return res
+        
+
     raise NotImplementedError
 
 def parse_address_a(addr_len: int, addr_bytes: bytes) -> str:
@@ -137,12 +191,13 @@ def parse_address_aaaa(addr_len: int, addr_bytes: bytes) -> str:
     '''Extract IPv6 address'''
     addr_bytes = bytearray([int(hex(elem),16) for elem in addr_bytes])
 
-    sub_parts = [addr_bytes.hex()[i:i+4] for i in range(0,len(addr_bytes.hex())-4,4)]
+    four_bit_groups = [addr_bytes.hex()[i:i+4] for i in range(0,addr_len,4)]
     address = ""
-    for s in range(len(sub_parts)):
-        if sub_parts[s].startswith("000"):
-            sub_parts[s] = sub_parts[s].replace("000","")
-        address += sub_parts[s] + ":"
+    # get rid of starting zeroes.
+    for f in range(len(four_bit_groups)):
+        if four_bit_groups[f].startswith("000"):
+            four_bit_groups[f] = four_bit_groups[f].replace("000","")
+        address += four_bit_groups[f] + ":"
 
     return address[:len(address)-1]
 
@@ -150,7 +205,9 @@ def resolve(query: str) -> None:
     '''Resolve the query'''
     q_type, q_domain, q_server = parse_cli_query(*query[0])
     query_bytes = format_query(q_type, q_domain)
+    print(query_bytes)
     response_bytes = send_request(query_bytes, q_server)
+    print(response_bytes)
     answers = parse_response(response_bytes)
     print('DNS server used: {}'.format(q_server))
     for a in answers:
