@@ -139,6 +139,7 @@ def parse_response(resp_bytes: bytes):
 
 
 def get_name(resp_bytes: bytes, start_of_name: hex, builder: int) -> str:
+    '''Get domain name from response'''
     current_subname_len = int(hex(start_of_name),16)
     name = []
     while current_subname_len != 0:
@@ -152,39 +153,54 @@ def get_name(resp_bytes: bytes, start_of_name: hex, builder: int) -> str:
     name.pop()
     return "".join(name)
 
-def build_info(resp_bytes: bytes, offset: int, q_type: int, length: int) -> int:
-    start_of_name, builder = resp_bytes[int(hex(resp_bytes[offset+1]),16)], int(hex(resp_bytes[offset+1]),16) + 1
+def build_info(resp_bytes: bytes, offset: int, q_type: int, length: int, label: bool) -> tuple:
+    '''Parse response extracting name, ttl and IP address'''
+    # This function modifies the offset that gets passed to parse_answers.
+    if label:
+        start_of_name, builder = resp_bytes[int(hex(resp_bytes[offset]),16)], \
+        int(hex(resp_bytes[offset]),16) + 1
+    else:
+        start_of_name, builder = int(hex(resp_bytes[offset]),16), \
+        offset + 1
+    # Get name and ttl
     name = get_name(resp_bytes, start_of_name, builder)
-    # ========================================================
-    ## ttl use offset
-    ttl = bytes_to_val([resp_bytes[offset+x] for x in range(6,10)])
+    ttl = bytes_to_val([resp_bytes[offset+x] for x in range(5,9)])
+
+    # Control structure that determines how to increase the offset.
     if q_type == 1:
-        ip = parse_address_a(length, resp_bytes[offset+12:offset+12+length])
-        info = (name, ttl, ip)
+        ip = parse_address_a(length, resp_bytes[offset+11:offset+11+length])
+        offset += 15
     elif q_type == 28:
-        ip = parse_address_aaaa(length, resp_bytes[offset+12:offset+12+length])
-        info = (name, ttl, ip)
+        ip = parse_address_aaaa(length, resp_bytes[offset+11:offset+11+length])
+        offset += 11 + length
     else:
         raise Exception("We are ignoring other query types (CNAME, MX, TXT) for now.")
-    return info
+
+    info = (name, ttl, ip)
+    return info, offset
 
 def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
     '''Parse DNS server answers'''
     res = []
-    # extract name again (would be so much easier if we passed name as a parameter.)
-    # this works when we get 0c c0
+    # extract name again (would be so much easier if we passed name as a parameter.
     
+    # get two bits of two byte sequence. (offset)
+    labeled = False
     if get_2_bits([resp_bytes[offset],resp_bytes[offset+1]]) == 3:
-        # iterate however many rr_ans received, extracting the ip address.
+        labeled = True
+
+        # Iterate over however many rr_ans received, extracting the ip address.
         for i in range(rr_ans):
             q_type = bytes_to_val([resp_bytes[offset+2], resp_bytes[offset+3]])
             length = bytes_to_val([resp_bytes[offset+10], resp_bytes[offset+11]])
-            if q_type == 1:
-                info = build_info(resp_bytes, offset, q_type, length)
-                offset += 16
-            elif q_type == 28:
-                info = build_info(resp_bytes, offset, q_type, length)
-                offset += 12 + length
+
+            # Build info is reponsible for determining the q_type
+            # which determines how to increase the offset.
+            # The offset is returned as the second value from build_info.
+            rv = build_info(resp_bytes, offset+1, q_type, length, labeled)
+            info, offset = rv[0], rv[1]
+
+
 
             # getname
             # ========================================================
@@ -211,7 +227,7 @@ def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
         for i in range(rr_ans):
             # getname
             # ========================================================
-            start_of_name, builder = int(hex(offset),16), int(hex(offset),16) + 1
+            start_of_name, builder = int(hex(resp_bytes[offset]),16), int(hex(offset),16) + 1
             name = get_name(resp_bytes, start_of_name, n, builder)
             # ========================================================
             loc = offset+len(name)
