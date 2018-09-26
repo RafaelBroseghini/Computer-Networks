@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import sys
+import time
 from random import randint, choice, seed
 from socket import socket, SOCK_DGRAM, AF_INET
 
@@ -52,8 +53,8 @@ def bytes_to_val(bytes_lst: list) -> int:
         temp = []
         # grab every two elements and merge.
         for n in range(len(result)-1):
-            combined = result[n] << 8 | result[n+1]
-            temp.append(combined)
+            merged = result[n] << 8 | result[n+1]
+            temp.append(merged)
         result = temp
     return result[0]
 
@@ -94,6 +95,7 @@ def format_query(q_type: int, q_domain: list) -> bytearray:
         res = val_to_2_bytes(n)
         query.append(res[0])
         query.append(res[1])
+
     # Domain
     for sub_domain in q_domain:
         query.append(len(sub_domain))
@@ -134,30 +136,26 @@ def parse_response(resp_bytes: bytes):
     offset = i + 5
     answers = parse_answers(resp_bytes, offset, rr_ans)
     return answers
-    raise NotImplementedError
 
 def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
     '''Parse DNS server answers'''
-    # loop over rr_ans
     res = []
+    # extract name again (would be so much easier if we passed name as a parameter.)
     start_of_name, i, builder = resp_bytes[12], 12, 13
-    j = int(hex(start_of_name),16)
-    current = int(hex(start_of_name),16)
+    current_subname_len = int(hex(start_of_name),16)
     name = ""
-    while current != 0:
-        for m in range(j):
+    while current_subname_len != 0:
+        for m in range(current_subname_len):
             name += chr(int(hex(resp_bytes[builder]),16))
             i += 1
             builder += 1
         name += "."
-        j = int(hex(resp_bytes[builder]),16)
-        current = int(hex(resp_bytes[builder]),16)
+        current_subname_len = int(hex(resp_bytes[builder]),16)
         builder += 1
     name = name[:len(name)-1]
     ## ttl use offset
-    
-    ttl = bytes_to_val([resp_bytes[offset+6], resp_bytes[offset+7],resp_bytes[offset+8],resp_bytes[offset+9]])
-
+    ttl = bytes_to_val([resp_bytes[offset+x] for x in range(6,10)])
+    # iterate however many rr_ans received, extracting the ip address.
     for i in range(rr_ans):
         q_type = bytes_to_val([resp_bytes[offset+2], resp_bytes[offset+3]])
         length = bytes_to_val([resp_bytes[offset+10], resp_bytes[offset+11]])
@@ -169,6 +167,8 @@ def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
             ip = parse_address_aaaa(length, resp_bytes[offset+12:offset+12+length])
             info = (name, ttl, ip)
             offset += 12 + length
+        elif q_type == 5:
+            raise Exception("We are ignoring CNAME query types for now")
 
 
         res.append(info)
@@ -196,7 +196,7 @@ def parse_address_aaaa(addr_len: int, addr_bytes: bytes) -> str:
                 else:
                     all_zeroes = False
                     addr_bytes[g] = addr_bytes[g][i:]
-
+        # append to the address
         address.append(addr_bytes[g])
         address.append(":")
     address.pop() #this pops overflow ':'
@@ -220,8 +220,10 @@ def main(*query):
     if len(query[0]) < 3 or len(query[0]) > 4:
         print('Proper use: python3 resolver <type> <domain> <server>')
         exit()
+    start = time.time()
     resolve(query)
-
+    end = time.time()
+    print("Resolved in {:.3f}s".format(end-start))
 
 if __name__ == '__main__':
     main(sys.argv)
