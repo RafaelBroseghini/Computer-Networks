@@ -152,6 +152,22 @@ def get_name(resp_bytes: bytes, start_of_name: hex, builder: int) -> str:
     name.pop()
     return "".join(name)
 
+def build_info(resp_bytes: bytes, offset: int, q_type: int, length: int) -> int:
+    start_of_name, builder = resp_bytes[int(hex(resp_bytes[offset+1]),16)], int(hex(resp_bytes[offset+1]),16) + 1
+    name = get_name(resp_bytes, start_of_name, builder)
+    # ========================================================
+    ## ttl use offset
+    ttl = bytes_to_val([resp_bytes[offset+x] for x in range(6,10)])
+    if q_type == 1:
+        ip = parse_address_a(length, resp_bytes[offset+12:offset+12+length])
+        info = (name, ttl, ip)
+    elif q_type == 28:
+        ip = parse_address_aaaa(length, resp_bytes[offset+12:offset+12+length])
+        info = (name, ttl, ip)
+    else:
+        raise Exception("We are ignoring other query types (CNAME, MX, TXT) for now.")
+    return info
+
 def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
     '''Parse DNS server answers'''
     res = []
@@ -161,25 +177,34 @@ def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
     if get_2_bits([resp_bytes[offset],resp_bytes[offset+1]]) == 3:
         # iterate however many rr_ans received, extracting the ip address.
         for i in range(rr_ans):
-            # getname
-            # ========================================================
-            start_of_name, builder = resp_bytes[int(hex(resp_bytes[offset+1]),16)], int(hex(resp_bytes[offset+1]),16) + 1
-            name = get_name(resp_bytes, start_of_name, builder)
-            # ========================================================
-            ## ttl use offset
-            ttl = bytes_to_val([resp_bytes[offset+x] for x in range(6,10)])
             q_type = bytes_to_val([resp_bytes[offset+2], resp_bytes[offset+3]])
             length = bytes_to_val([resp_bytes[offset+10], resp_bytes[offset+11]])
             if q_type == 1:
-                ip = parse_address_a(length, resp_bytes[offset+12:offset+12+length])
+                info = build_info(resp_bytes, offset, q_type, length)
                 offset += 16
-                info = (name, ttl, ip)
             elif q_type == 28:
-                ip = parse_address_aaaa(length, resp_bytes[offset+12:offset+12+length])
-                info = (name, ttl, ip)
+                info = build_info(resp_bytes, offset, q_type, length)
                 offset += 12 + length
-            else:
-                raise Exception("We are ignoring other query types (CNAME, MX, TXT) for now.")
+
+            # getname
+            # ========================================================
+            # start_of_name, builder = resp_bytes[int(hex(resp_bytes[offset+1]),16)], int(hex(resp_bytes[offset+1]),16) + 1
+            # name = get_name(resp_bytes, start_of_name, builder)
+            # # ========================================================
+            # ## ttl use offset
+            # ttl = bytes_to_val([resp_bytes[offset+x] for x in range(6,10)])
+            # q_type = bytes_to_val([resp_bytes[offset+2], resp_bytes[offset+3]])
+            # length = bytes_to_val([resp_bytes[offset+10], resp_bytes[offset+11]])
+            # if q_type == 1:
+            #     ip = parse_address_a(length, resp_bytes[offset+12:offset+12+length])
+            #     offset += 16
+            #     info = (name, ttl, ip)
+            # elif q_type == 28:
+            #     ip = parse_address_aaaa(length, resp_bytes[offset+12:offset+12+length])
+            #     info = (name, ttl, ip)
+            #     offset += 12 + length
+            # else:
+            #     raise Exception("We are ignoring other query types (CNAME, MX, TXT) for now.")
 
             res.append(info)
     else:
