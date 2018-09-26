@@ -133,7 +133,7 @@ def parse_response(resp_bytes: bytes):
         j = int(hex(resp_bytes[i]),16)
     offset = i + 5
     answers = parse_answers(resp_bytes, offset, rr_ans)
-
+    return answers
     raise NotImplementedError
 
 def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
@@ -158,20 +158,15 @@ def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
     
     ttl = bytes_to_val([resp_bytes[offset+6], resp_bytes[offset+7],resp_bytes[offset+8],resp_bytes[offset+9]])
 
-    
-
     for i in range(rr_ans):
         q_type = bytes_to_val([resp_bytes[offset+2], resp_bytes[offset+3]])
-        print(q_type)
         length = bytes_to_val([resp_bytes[offset+10], resp_bytes[offset+11]])
-        print(length)
         if q_type == 1:
             ip = parse_address_a(length, resp_bytes[offset+12:offset+12+length])
             offset += 16
             info = (name, ttl, ip)
         elif q_type == 28:
             ip = parse_address_aaaa(length, resp_bytes[offset+12:offset+12+length])
-            print(ip)
             info = (name, ttl, ip)
             offset += 12 + length
 
@@ -180,40 +175,45 @@ def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
     
     return res
         
-
-    raise NotImplementedError
-
 def parse_address_a(addr_len: int, addr_bytes: bytes) -> str:
     '''Extract IPv4 address'''
     return ".".join([str(addr_bytes[sub]) for sub in range(addr_len)])
 
 def parse_address_aaaa(addr_len: int, addr_bytes: bytes) -> str:
     '''Extract IPv6 address'''
-    addr_bytes = bytearray([int(hex(elem),16) for elem in addr_bytes])
-
-    four_bit_groups = [addr_bytes.hex()[i:i+4] for i in range(0,addr_len,4)]
-    address = ""
+    addr_bytes = [addr_bytes.hex()[i:i+4] for i in range(0, addr_len*2,4)]
+    address = []
     # get rid of starting zeroes.
-    for f in range(len(four_bit_groups)):
-        if four_bit_groups[f].startswith("000"):
-            four_bit_groups[f] = four_bit_groups[f].replace("000","")
-        address += four_bit_groups[f] + ":"
+    for g in range(len(addr_bytes)):
+        if addr_bytes[g] == "0000":
+            addr_bytes[g] = "0"
+        elif addr_bytes[g].startswith("0"):
+            all_zeroes = True
+            i = 0
+            while all_zeroes:
+                if addr_bytes[g][i] == "0":
+                    i += 1
+                else:
+                    all_zeroes = False
+                    addr_bytes[g] = addr_bytes[g][i:]
 
-    return address[:len(address)-1]
+        address.append(addr_bytes[g])
+        address.append(":")
+    address.pop() #this pops overflow ':'
+
+    return "".join(address)
 
 def resolve(query: str) -> None:
     '''Resolve the query'''
     q_type, q_domain, q_server = parse_cli_query(*query[0])
     query_bytes = format_query(q_type, q_domain)
-    print(query_bytes)
     response_bytes = send_request(query_bytes, q_server)
-    print(response_bytes)
     answers = parse_response(response_bytes)
     print('DNS server used: {}'.format(q_server))
     for a in answers:
         print('Domain: {}'.format(a[0]))
         print('TTL: {}'.format(a[1]))
-        print('Address: {}'.format(a[2]))
+        print('Address: {}\n'.format(a[2]))
 
 def main(*query):
     '''Main function'''
