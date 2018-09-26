@@ -69,7 +69,7 @@ def get_2_bits(bytes_lst: list) -> int:
         result.append(val)
     return result[0] << 1 | result[1]
 
-def get_offset(bytes: list) -> int:
+def get_offset(bytes_lst: list) -> int:
     '''Extract size of the offset from a two-byte sequence'''
     return ((bytes_lst[0] & 0x3f) << 8) + bytes_lst[1]
 
@@ -276,7 +276,7 @@ def resolve(query: str) -> None:
 def main(*query):
     '''Main function'''
     if len(query[0]) < 3 or len(query[0]) > 4:
-        print('Proper use: python3 resolver <type> <domain> <server>')
+        print('Proper use: python3 resolver.py <type> <domain> <server>')
         exit()
     start = time.time()
     resolve(query)
