@@ -157,7 +157,7 @@ def build_info(resp_bytes: bytes, offset: int, q_type: int, length: int, label: 
     '''Parse response extracting name, ttl and IP address'''
     # This function modifies the offset that gets passed to parse_answers.
     if label:
-        builder = int(hex(resp_bytes[offset]),16) + 1
+        builder = get_offset([resp_bytes[offset-1], resp_bytes[offset]]) + 1 # returns 13 when labeled c0 0c
     else:
         builder = offset + 1
         
