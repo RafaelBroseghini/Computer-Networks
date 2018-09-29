@@ -60,7 +60,7 @@ class TestResolver:
         assert exception_msg == 'Unknown query type'
 
     def test_format_query(self):
-        assert format_query(1, ['luther', 'edu'])[2:] == b'\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x06luther\x03edu\x00\x00\x01\x00\x01'
+        assert format_query(1, ['luther', 'edu']) == b'OB\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x06luther\x03edu\x00\x00\x01\x00\x01'
 
     def test_parse_response(self):
         '''Parse the response'''

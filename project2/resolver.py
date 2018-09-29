@@ -86,7 +86,9 @@ def parse_cli_query(filename, q_type, q_domain, q_server=None) -> tuple:
 
 def format_query(q_type: int, q_domain: list) -> bytearray:
     '''Format DNS query'''
-    transaction_id = val_to_2_bytes(randint(0, 65535))
+    # transaction_id = val_to_2_bytes(randint(0, 65535))
+    # Hard coding transaction id.
+    transaction_id = [79,66]
     query = bytearray([transaction_id[0], transaction_id[1], 1, 0])
 
     # Flags
