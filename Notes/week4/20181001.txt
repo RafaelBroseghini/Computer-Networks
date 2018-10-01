@@ -1,0 +1,34 @@
+Date: 10/01/2018
+================
+
+New protocol replacing HTTP:
+    - QUIC:
+        - You can see inside your browser.
+
+
+Transport Layer
+    - UDP:
+        - Connectionless transport.
+        - Best effort protocol.
+        - Datagrams.
+
+    - TCP:
+        - Segments.
+    
+    - Transport Services:
+        - Logical communication between applications.
+            - addr of my machine and port number; addr of other machine and port number.
+
+    - Transport         vs      Network:
+        - Protocols:
+            - TCP;UDP           IP, IPV6
+
+        - Communication:
+            - Processes         Hosts
+
+        - Identifier used:
+            - 
+
+
+    
+        
