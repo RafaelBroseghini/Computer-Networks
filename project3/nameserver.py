@@ -33,22 +33,37 @@ TTL_SEC = {
 
 def val_to_bytes(value: int, n_bytes: int) -> list:
     '''Split a value into n bytes'''
-    raise NotImplementedError
+    n_decimal = []
+    for i in range(n_bytes):
+        result = value & 0xFF
+        value >>= 8
+        n_decimal.insert(0, result)
+    return n_decimal
 
 
 def bytes_to_val(bytes_lst: list) -> int:
     '''Merge n bytes into a value'''
-    raise NotImplementedError
+    result = list(bytes_lst)
+    while len(result) > 1:
+        temp = []
+        # grab every two elements and merge.
+        for n in range(len(result)-1):
+            merged = result[n] << 8 | result[n+1]
+            temp.append(merged)
+        result = temp
+    return result[0]
 
 
 def get_left_bits(bytes_lst: list, n_bits: int) -> int:
     '''Extract left n bits of a two-byte sequence'''
-    raise NotImplementedError
+    val = bytes_to_val(bytes_lst)
+    return val >> (16-n_bits)
 
 
 def get_right_bits(bytes_lst: list, n_bits) -> int:
     '''Extract right n bits bits of a two-byte sequence'''
-    raise NotImplementedError
+    val = bytes_to_val(bytes_lst)
+    return val & (2**n_bits) - 1 
 
 
 def read_zone_file(filename: str) -> tuple:
