@@ -1,0 +1,15 @@
+Date: 10/03/2018
+================
+
+1 - ICMP
+6 - TCP
+17 - 
+
+How Demultiplexing (striping the packets of the header and forwarding to the right protocol) Works
+    - Host receives IP address:
+        - each packet has a source IP address,
+        destination IP address.
+
+        - each packet carries one transport layer segment
+
+        - each segment has a source, destination port number
