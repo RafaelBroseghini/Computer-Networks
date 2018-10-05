@@ -13,3 +13,25 @@ How Demultiplexing (striping the packets of the header and forwarding to the rig
         - each packet carries one transport layer segment
 
         - each segment has a source, destination port number
+
+
+UDP:
+    - Original proposal:
+        - Only 3 pages; describes fully; formatting; fields
+        - Thin layer between IP and Application layer.
+    
+    - Largest size of UDP packet:
+        - 65535 - 8  = 65527
+    
+    - Thechecksum checks that the message came to the layer as expected.
+        - Useful as errors can get in the packet, due to outside factors.
+        - Checked at:
+            - IP
+            - TCP/UDP/ICMP
+    
+    UDP use:
+        - streaming multimedia apps(loss tolerant, rate sensitive)
+        - DNS, DHCP, NTP, SNMP
+
+        - You can have reliability but has to be provided by the application.
+        
