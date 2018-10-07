@@ -133,7 +133,7 @@ def parse_request(origin: str, msg_req: bytes) -> tuple:
     if class_ != 1:
         raise ValueError("Unknown class")
 
-    if origin != "cs430.luther.edu":
+    if full_name[len(first_subdomain)+1:] != "cs430.luther.edu":
         raise ValueError("Unknown zone")
         
 
