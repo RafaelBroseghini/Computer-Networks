@@ -5,7 +5,7 @@ import time
 from random import randint, choice, seed
 from socket import socket, SOCK_DGRAM, AF_INET
 
-HOST = 'localhost'
+HOST = "localhost"
 PORT = 43053
 
 DNS_TYPES = {
@@ -70,7 +70,7 @@ def get_2_bits(bytes_lst: list) -> int:
         result.append(val)
     return result[0] << 1 | result[1]
 
-def get_offset(bytes_lst: list) -> int:
+def get_domain_name_location(bytes_lst: list) -> int:
     '''Extract size of the offset from a two-byte sequence'''
     return ((bytes_lst[0] & 0x3f) << 8) + bytes_lst[1]
 
@@ -131,12 +131,10 @@ def parse_response(resp_bytes: bytes):
     '''Parse server response'''
     start_of_name, i = resp_bytes[12], 12
     rr_ans = bytes_to_val([resp_bytes[6], resp_bytes[7]]) or bytes_to_val([resp_bytes[8], resp_bytes[9]])
-    j = int(hex(start_of_name),16)
     current = int(hex(start_of_name),16)
     while current != 0:
-        i += j + 1
+        i += current + 1
         current = int(hex(resp_bytes[i]),16)
-        j = int(hex(resp_bytes[i]),16)
     offset = i + 5
     answers = parse_answers(resp_bytes, offset, rr_ans)
     return answers
@@ -154,14 +152,15 @@ def get_name(resp_bytes: bytes, start_of_name: hex, builder: int) -> str:
         name.append(".")
         current_subname_len = int(hex(resp_bytes[builder]),16)
         builder += 1
-    name.pop()
+    # name.pop()
+    name = name[:len(name)-1]
     return "".join(name)
 
 def build_info(resp_bytes: bytes, offset: int, q_type: int, length: int, label: bool) -> tuple:
     '''Parse response extracting name, ttl and IP address'''
     # This function modifies the offset that gets passed to parse_answers.
     if label:
-        builder = get_offset([resp_bytes[offset-1], resp_bytes[offset]]) + 1 # returns 13 when labeled c0 0c
+        builder = get_domain_name_location([resp_bytes[offset-1], resp_bytes[offset]]) + 1 # returns 13 when labeled c0 0c
     else:
         builder = offset + 1
         
@@ -190,7 +189,7 @@ def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
     
     # get two bits of two byte sequence. (offset)
     labeled = False
-    if get_2_bits([resp_bytes[offset],resp_bytes[offset+1]]) == 3:
+    if resp_bytes[offset] == 192:
         labeled = True
 
         # Iterate over however many rr_ans received, extracting the ip address.
@@ -206,28 +205,32 @@ def parse_answers(resp_bytes: bytes, offset: int, rr_ans: int) -> list:
 
             res.append(info)
     else:
+        start_of_name, builder = int(hex(resp_bytes[offset]),16)+1, int(hex(offset),16)
+        name = get_name(resp_bytes, start_of_name, builder)[1:]
+        loc = offset+len(name)+1
         for i in range(rr_ans):
-            # getname
-            # ========================================================
-            start_of_name, builder = int(hex(resp_bytes[offset]),16), int(hex(offset),16) + 1
-            name = get_name(resp_bytes, start_of_name, n, builder)
-            # ========================================================
-            loc = offset+len(name)
-            ttl = bytes_to_val([resp_bytes[loc+x] for x in range(6,10)])
-            q_type = bytes_to_val([resp_bytes[loc+2], resp_bytes[loc+3]])
-            length = bytes_to_val([resp_bytes[loc+10], resp_bytes[loc+11]])
+            ttl = bytes_to_val([resp_bytes[loc+x] for x in range(5,9)])
+            q_type = bytes_to_val([resp_bytes[loc+1], resp_bytes[loc+2]])
+            length = bytes_to_val([resp_bytes[loc+9], resp_bytes[loc+10]])
+            
             if q_type == 1:
-                ip = parse_address_a(length, resp_bytes[loc+12:loc+12+length])
-                loc += 16
+                ip = parse_address_a(length, resp_bytes[loc+11:loc+11+length])             
+                loc += 16 + len(name)
                 info = (name, ttl, ip)
             elif q_type == 28:
-                ip = parse_address_aaaa(length, resp_bytes[loc+12:loc+12+length])
+                ip = parse_address_aaaa(length, resp_bytes[loc+11:loc+11+length])
                 info = (name, ttl, ip)
-                loc += 12 + length
+                loc += 16 + len(name)
             elif q_type == 5:
                 raise Exception("We are ignoring CNAME query types for now")
-
+            
+            print("ttl", ttl)
+            print("qtype", q_type)
+            print("length", length)
+            print("loc", loc)
+            print("ip", ip)
             res.append(info)
+            print(res)
 
     return res
         
@@ -265,7 +268,7 @@ def resolve(query: str) -> None:
     query_bytes = format_query(q_type, q_domain)
     response_bytes = send_request(query_bytes, q_server)
     answers = parse_response(response_bytes)
-    print('DNS server used: nameserver.py\n')
+    print('DNS server used: nameserver.py\n')       
     for a in answers:
         print('Domain: {}'.format(a[0]))
         print('TTL: {}'.format(a[1]))

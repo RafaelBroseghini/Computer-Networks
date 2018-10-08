@@ -126,7 +126,7 @@ def parse_request(origin: str, msg_req: bytes) -> tuple:
     class_  = bytes_to_val([msg_req[i+3], msg_req[i+4]])
     query = msg_req[12:]
 
-
+    
     if qry_type not in DNS_TYPES:
         raise ValueError("Unknown query type")
 
@@ -142,6 +142,10 @@ def parse_request(origin: str, msg_req: bytes) -> tuple:
 
 def format_response(zone: dict, trans_id: int, qry_name: str, qry_type: int, qry: bytearray) -> bytearray:
     '''Format the response'''
+
+    if qry_name not in zone:
+        raise ValueError("Unknown name")
+
     response = bytearray()
     for t in val_to_bytes(trans_id, 2):
         response.append(t)
