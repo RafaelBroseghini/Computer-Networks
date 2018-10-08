@@ -129,12 +129,10 @@ def parse_response(resp_bytes: bytes):
     '''Parse server response'''
     start_of_name, i = resp_bytes[12], 12
     rr_ans = bytes_to_val([resp_bytes[6], resp_bytes[7]]) or bytes_to_val([resp_bytes[8], resp_bytes[9]])
-    j = int(hex(start_of_name),16)
     current = int(hex(start_of_name),16)
     while current != 0:
-        i += j + 1
+        i += current + 1
         current = int(hex(resp_bytes[i]),16)
-        j = int(hex(resp_bytes[i]),16)
     offset = i + 5
     answers = parse_answers(resp_bytes, offset, rr_ans)
     return answers
