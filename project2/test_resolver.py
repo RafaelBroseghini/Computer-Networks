@@ -33,14 +33,11 @@ class TestResolver:
     def test_val_to_bytes(self):
         '''Convert a value to 2 bytes'''
         assert val_to_2_bytes(43043) == [168, 35]
-        assert val_to_2_bytes(1) == [0, 1]
-        assert val_to_2_bytes(43) == [0, 43]
         assert val_to_n_bytes(430430, 3) == [6, 145, 94]
 
     def test_bytes_to_val(self):
         '''Convert list of bytes to a value'''
         assert bytes_to_val([6, 145, 94]) == 430430
-        assert bytes_to_val([0, 1]) == 1
 
     def test_get_2_bits(self):
         '''Get 2 bits'''
@@ -69,6 +66,7 @@ class TestResolver:
         assert exception_msg == 'Unknown query type'
 
     def test_format_query(self):
+        '''Format a query'''
         assert format_query(1, ['luther', 'edu']) == b'OB\x01\x00\x00\x01\x00\x00\x00\x00\x00\x00\x06luther\x03edu\x00\x00\x01\x00\x01'
 
     def test_parse_response(self):
