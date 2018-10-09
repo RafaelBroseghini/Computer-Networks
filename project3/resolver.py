@@ -80,8 +80,9 @@ def parse_cli_query(filename, q_type, q_domain, q_server=None) -> tuple:
         raise ValueError("Unknown query type")
     q_type = DNS_TYPES[q_type]
     q_domain = q_domain.split(".")
-    if not q_server:
-        q_server = choice(PUBLIC_DNS_SERVER)
+
+    if q_server == None:
+        q_server = "127.0.0.1"
     
     return q_type, q_domain, q_server
 
@@ -268,7 +269,7 @@ def resolve(query: str) -> None:
     query_bytes = format_query(q_type, q_domain)
     response_bytes = send_request(query_bytes, q_server)
     answers = parse_response(response_bytes)
-    print('DNS server used: nameserver.py\n')       
+    print('DNS server used: {}\n'.format(q_server))       
     for a in answers:
         print('Domain: {}'.format(a[0]))
         print('TTL: {}'.format(a[1]))
