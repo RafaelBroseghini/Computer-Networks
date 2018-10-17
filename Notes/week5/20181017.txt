@@ -1,0 +1,18 @@
+Date: 10/17/2018
+================
+
+Reliable Transfer Data
+    - Application does not provide reliability but it needs reliability.
+    - Rely on the transport layer to transfer data.
+
+IPV4 and IPV6 are not reliable protocols.
+
+    - Transport layer protocol slaps app layer header and goes to network layer.
+    - Goes to link header. adds it.
+
+
+Error detection:
+    - Checksum
+
+    - Acknowledgments
+        - OK
