@@ -1,0 +1,70 @@
+Pipelining:
+    - Size/ bandiwth /( rtt + (size/bdwth) )
+    - RTT drives utiliztion to 0
+
+    - Go back n
+    - Selective repeat.
+
+
+
+Neither of them (UDP, TCP) corrects errors that occur in a packet.
+
+UDP does not fix errors?
+    - UCP does not do redo transmission.
+
+Transmission Control Protocol:
+    - You can have reliability. They must happen at the app layer.
+    - App responsibility to retransmit it.
+    - Connection oriented. 3 way handshake.
+
+    - Point-to-Point
+        - One process on one end and one process on the other end.
+
+    - Reliable byte stream.
+        - retransmission.
+
+    - Full duplex:
+        - Data can flow both ways.
+
+    - Pipelined
+
+    - Flow control:
+        - Client, Server can slow down each other.
+        - The receiver cannot process data that fast.
+    
+    - Congestion control:
+        - There is a congestion in the network.
+        - ROuter etc cannot trasmit data that fast.
+        - Sender will slow down, no need to congest the network.
+
+
+    - Sequence number and Acknowledgment:
+        - Seq number is the byte stream number of the first byte in a segment.
+
+    - TCP uses cumulative Acknowledgment.
+        - Acks butes up to the first missing byte.
+    
+    - real relative sent by the server: (convert hex to dec)
+        - SYN/ACK sequence. Three way handshake.
+
+    - What is the throughput (bytes transferred per unit time) for the TCP connection?
+        - stats/summary
+        - summ all length up until http.
+
+    - look for fin packet.
+    
+    - What is the minimum amount of available buffer space advertised at the received for the entire trace? Does the lack of receiver buffer space ever throttle the sender?
+        - look at windown size.
+        - see if that effected the next packet.
+        
+    - Many packets from the server have some random padding added at the end (## 6, 9, 12 etc.) Why packets need to be at least 60 bytes long?
+        - more of ethernet question.
+
+    - Packets #3 and #206 are smaller than 60 bytes and yet not padded. Why is that?
+        - wireshark and stacks of protocol.
+
+    - What is the indication that the file was transmitted successfully?
+        - 200 response code.
+    
+
+    - Both will slow down the sender. (CT, FT)
