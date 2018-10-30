@@ -1,0 +1,36 @@
+Date: 10/29/2018
+================
+
+Congestion Control:
+    - Lost packets.
+    - Long delays.
+
+
+How can the sender tlimit the traffic rate?
+    - Increase timeouts?
+
+How can the sender perceive there is congestion?
+    - Timeout.
+
+
+Why can a packet can be lost?
+    - Something got so filled up, that it dropped a packet.
+    - Router is overwhelmed that it dropped a packet. (Congestion)
+
+    - Corruption of the packet. Checksum does not match the expected
+        value.
+
+Flow Control comes from receiver. Congestion Control starts with sender.
+
+Three ACKS gives a good indication that we have a problem. Let's resend that packet.
+
+
+Tahoe:
+    - stop completely.
+
+Reno:
+    - Send half of what we sent before.
+
+16 - triple duplicated ack.
+
+22- timeout.
