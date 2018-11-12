@@ -49,12 +49,17 @@ def build_and_send_response(conn: socket, data: list):
         conn.send(headers["Date"].encode())
         conn.send(headers["Server"].encode())
 
+        conn.send("<html><body><h1>Use GET to retrieve resources.</h1></body></html>\r\n".encode())
+
     elif data[1] != "/alice30.txt":
+        header = ""
         headers["FULL HTTP"] = "HTTP/1.1 404 Not Found\r\n"
 
         conn.send(headers["FULL HTTP"].encode())
         conn.send(headers["Date"].encode())
         conn.send(headers["Server"].encode())
+
+        conn.send("<html><body><h1>404 Not Found</h1></body></html>\r\n".encode())
 
     else:
         headers["FULL HTTP"] = "HTTP/1.1 200 OK\r\n"
@@ -89,7 +94,6 @@ def main():
                     uri = data[1]
                     write_to_log(uri, json_data)
                     build_and_send_response(conn, data)
-
                 else:
                     print('Connection closed')
                     exit()
