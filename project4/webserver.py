@@ -36,38 +36,43 @@ def build_and_send_response(conn: socket, data: list):
             "Content-Type"      : "Content-Type: text/plain; charset=utf-8\r\n",
             "Date"              : "Date: {}".format(str(datetime.now()) + "\r\n"),
             "Last-Modified"     : "Last-Modified: Friday, August 29, 2018 11:00 AM\r\n",
-            "Connection"        : "Connection: close\r\n",
             "Server"            : "Server: CS430-Rafa\r\n\r\n"
         }
 
     if data[0] != "GET":
+        content = "<html><body><h1>Use GET to retrieve resources.</h1></body></html>\r\n"
+
         headers["FULL HTTP"] = "HTTP/1.1 405 Method Not Allowed\r\n"
-        headers["Allow"] = "Allow: GET\r\n"
+        headers["Content-Length"] = "Content-Length: {}\r\n".format(len(content))
 
-        conn.send(headers["FULL HTTP"].encode())
-        conn.send(headers["Allow"].encode())
-        conn.send(headers["Date"].encode())
-        conn.send(headers["Server"].encode())
+        full_header = [headers[h] for h in headers if h != "Last-Modified"]
 
-        conn.send("<html><body><h1>Use GET to retrieve resources.</h1></body></html>\r\n".encode())
+        for h in full_header:
+            conn.send(h.encode())
+
+        conn.send("{}".format(content).encode())
 
     elif data[1] != "/alice30.txt":
-        header = ""
+        content = "<html><body><h1>404 Not Found.</h1></body></html>\r\n"
+
         headers["FULL HTTP"] = "HTTP/1.1 404 Not Found\r\n"
+        headers["Content-Length"] = "Content-Length: {}\r\n".format(len(content))
 
-        conn.send(headers["FULL HTTP"].encode())
-        conn.send(headers["Date"].encode())
-        conn.send(headers["Server"].encode())
+        full_header = [headers[h] for h in headers if h != "Last-Modified"]
 
-        conn.send("<html><body><h1>404 Not Found</h1></body></html>\r\n".encode())
+        for h in full_header:
+            conn.send(h.encode())
+
+        conn.send("{}".format(content).encode())
 
     else:
         headers["FULL HTTP"] = "HTTP/1.1 200 OK\r\n"
         headers["Content-Length"] += ALICE_LENGTH + "\r\n"
-        resp = [h.encode() for h in headers.values()]
+
+        response = [h.encode() for h in headers.values()]
         content = [word.encode() for word in open("alice30.txt").readlines()]
 
-        for h in resp:
+        for h in response:
             conn.send(h)
 
         for line in content:
