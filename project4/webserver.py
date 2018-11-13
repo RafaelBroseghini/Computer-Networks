@@ -44,6 +44,7 @@ def build_and_send_response(conn: socket, data: list):
 
         headers["FULL HTTP"] = "HTTP/1.1 405 Method Not Allowed\r\n"
         headers["Content-Length"] = "Content-Length: {}\r\n".format(len(content))
+        headers["Content-Type"] = "Content-Type: text/html; charset=utf-8\r\n"
 
         full_header = [headers[h] for h in headers if h != "Last-Modified"]
 
@@ -57,6 +58,7 @@ def build_and_send_response(conn: socket, data: list):
 
         headers["FULL HTTP"] = "HTTP/1.1 404 Not Found\r\n"
         headers["Content-Length"] = "Content-Length: {}\r\n".format(len(content))
+        headers["Content-Type"] = "Content-Type: text/html; charset=utf-8\r\n"
 
         full_header = [headers[h] for h in headers if h != "Last-Modified"]
 
