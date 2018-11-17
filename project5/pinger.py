@@ -55,9 +55,7 @@ def checksum(pkt: bytes) -> int:
     return result
 
 
-def parse_reply(
-    my_socket: socket.socket, req_id: int, timeout: int, addr_dst: str
-) -> tuple:
+def parse_reply(my_socket: socket.socket, req_id: int, timeout: int, addr_dst: str) -> tuple:
     """Receive an Echo reply"""
     time_left = timeout
     while True:
@@ -71,12 +69,20 @@ def parse_reply(
         pkt_rcvd, addr = my_socket.recvfrom(1024)
         if addr[0] != addr_dst:
             raise ValueError(f"Wrong sender: {addr[0]}")
+        
+        ip_header = pkt_rcvd[:20]
+        destination, packet_size, round_trip_time, ttl = ip_header[12:16], len(pkt_rcvd), time_rcvd-started_select, ip_header[8]
+        destination = ".".join([str(sub) for sub in destination])
+        round_trip_time = "{:.2f}".format(round_trip_time*1000)
+
         # TODO: Extract ICMP header from the IP packet and parse it
-        # print_raw_bytes(pkt_rcvd)
+        # *destination address*, *packet size*, *roundtrip time*, *time to live*
         # DONE: End of ICMP parsing
         time_left = time_left - how_long_in_select
         if time_left <= 0:
             raise TimeoutError("Request timed out after 1 sec")
+
+        return destination, packet_size, round_trip_time, ttl
 
 
 def format_request(req_id: int, seq_num: int) -> bytes:
@@ -122,6 +128,28 @@ def send_request(addr_dst: str, seq_num: int, timeout: int = 1) -> tuple:
 def ping(host: str, pkts: int, timeout: int = 1) -> None:
     """Main loop"""
     # TODO: Implement the main loop
+    ip = socket.gethostbyname(host)  
+    print("--- Ping {} ({}) using Python ---\n".format(host, ip))
+
+    rtt_array, pkts_sent, pkts_received = [], 0, 0
+    for p in range(1, pkts+1):
+        pkts_sent += 1
+        try:
+            destination, packet_size, round_trip_time, ttl = send_request(ip, p)
+            print(f"{packet_size} bytes from {destination}: icmp_seq={p} TTL={ttl} time={round_trip_time} ms")
+            rtt_array.append(float(round_trip_time))
+            pkts_received += 1
+        except TimeoutError or ValueError as error:
+            print(f"No response: {error}")
+
+    pkt_loss = pkts_sent - pkts_received
+
+    print("\n--- {} ping statistics ---".format(host))
+    print(f"{pkts_sent} packets transmitted, {pkts_received} received, {int(pkt_loss/pkts_sent)*100}% packet loss")
+    
+    if len(rtt_array) > 0:
+        min_rtt, avg_rtt, max_rtt, mdev_rtt = min(rtt_array), mean(rtt_array), max(rtt_array), stdev(rtt_array)
+        print(f"rtt min/avg/max/mdev = {min_rtt}/{avg_rtt:.2f}/{max_rtt}/{mdev_rtt:.2f} ms\n")
 
     # DONE
     return
