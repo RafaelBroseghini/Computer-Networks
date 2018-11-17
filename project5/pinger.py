@@ -156,5 +156,6 @@ def ping(host: str, pkts: int, timeout: int = 1) -> None:
 
 
 if __name__ == "__main__":
+    # ping(sys.argv[1], 5)
     for rir in REGISTRARS:
         ping(rir, 5)
