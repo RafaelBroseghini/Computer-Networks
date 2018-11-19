@@ -75,6 +75,17 @@ def parse_reply(my_socket: socket.socket, req_id: int, timeout: int, addr_dst: s
         destination = ".".join([str(sub) for sub in destination])
         round_trip_time = "{:.2f}".format(round_trip_time*1000)
 
+        icmp_header = pkt_rcvd[20:]
+        
+        if icmp_header[0] != 0:
+            raise ValueError("Wrong ICMP type code.")
+        
+        if icmp_header[1] != 0:
+            raise ValueError("Wrong ICMP response code.")
+
+        if checksum(pkt_rcvd) != 0:
+            raise ValueError("Wrong checksum.")
+        
         # TODO: Extract ICMP header from the IP packet and parse it
         # *destination address*, *packet size*, *roundtrip time*, *time to live*
         # DONE: End of ICMP parsing
