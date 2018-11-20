@@ -71,25 +71,28 @@ def parse_reply(my_socket: socket.socket, req_id: int, timeout: int, addr_dst: s
             raise ValueError(f"Wrong sender: {addr[0]}")
         
         ip_header = pkt_rcvd[:20]
-        destination, packet_size, round_trip_time, ttl = ip_header[12:16], len(pkt_rcvd), time_rcvd-started_select, ip_header[8]
-        destination = ".".join([str(sub) for sub in destination])
-        round_trip_time = "{:.2f}".format(round_trip_time*1000)
-
-        icmp_header = pkt_rcvd[20:]
+        destination, packet_size, round_trip_time, ttl = ".".join([str(sub) for sub in ip_header[12:16]]), \
+        len(pkt_rcvd), "{:.2f}".format((time_rcvd-started_select)*1000), ip_header[8]
         
+        icmp_header = pkt_rcvd[20:]
+
+        chksum = icmp_header[2]<<8 | icmp_header[3]
+        
+        temp_icmp_header = bytearray(icmp_header)
+
+        temp_icmp_header[2], temp_icmp_header[3] = 0, 0
+
         if icmp_header[0] != 0:
             raise ValueError("Wrong ICMP type code.")
         
         if icmp_header[1] != 0:
             raise ValueError("Wrong ICMP response code.")
 
-        if checksum(pkt_rcvd) != 0:
+        if checksum(temp_icmp_header) != chksum:
             raise ValueError("Wrong checksum.")
         
-        # TODO: Extract ICMP header from the IP packet and parse it
-        # *destination address*, *packet size*, *roundtrip time*, *time to live*
-        # DONE: End of ICMP parsing
         time_left = time_left - how_long_in_select
+        
         if time_left <= 0:
             raise TimeoutError("Request timed out after 1 sec")
 
