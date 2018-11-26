@@ -143,11 +143,9 @@ def traceroute(hostname: str) -> None:
             try:
                 pkt_rcvd, responder = receive_reply(my_icmp_socket, TIMEOUT)
                 received_success += 1
-                
             except TimeoutError as te:
                 to_error_msg = str(te)
-            finally:
-                my_icmp_socket.close()
+            
             
             time_rcvd = time.time()
             rtt = (time_rcvd - time_sent) * 1000
@@ -157,6 +155,8 @@ def traceroute(hostname: str) -> None:
                 parsed_success += 1
             except ValueError as ve:
                 v_error_msg = str(ve)
+            finally:
+                my_icmp_socket.close()
 
             if to_error_msg:
                 print("{:>5s} {:2s}".format("TIME", " "), end="")
