@@ -13,7 +13,7 @@ import time
 
 HOST_ID = os.path.splitext(__file__)[0].split("_")[-1]
 THIS_NODE = f"127.0.0.{HOST_ID}"
-PORT = 4300
+PORT = 4300 + int(HOST_ID)
 NEIGHBORS = set()
 ROUTING_TABLE = {}
 TIMEOUT = 5
@@ -27,8 +27,18 @@ MESSAGES = [
 
 def read_file(filename: str) -> None:
     """Read config file"""
-    raise NotImplementedError
+    ROUTING_TABLE[THIS_NODE] = {}
 
+    with open(filename, "r") as infile:
+        full_table = [elem.split() for elem in infile.readlines() if elem.split() != []]
+
+        for router in range(len(full_table)):
+            if len(full_table[router]) == 1 and full_table[router][0] == THIS_NODE:
+                router += 1
+                while router < len(full_table) and len(full_table[router]) != 1:
+                    neighbor, cost = full_table[router][0], int(full_table[router][1])
+                    ROUTING_TABLE[THIS_NODE][neighbor] = [cost, neighbor]
+                    router += 1
 
 def format_update():
     """Format update message"""
@@ -62,12 +72,32 @@ def send_hello(msg_txt, src_node, dst_node):
 
 def print_status():
     """Print status"""
-    raise NotImplementedError
+    print(f"{'Host':^15} {'Cost':^10} {'Via':^15}")
+    for neighbor, data in ROUTING_TABLE[THIS_NODE].items():
+        # cost, via = data[0], data[1]
+        cost, via = data[0], data[1]
+        print(f"{neighbor:^15} {cost:^10} {via:^15}")
 
 
 def main(args: list):
     """Router main loop"""
-    raise NotImplementedError
+    current_time = time.strftime("%H:%M:%S", time.localtime())
+    print(f"{current_time} | Router {THIS_NODE} here")
+
+    server_sckt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    print(f"{current_time} | Binding on {THIS_NODE}:{PORT}")
+    server_sckt.bind((THIS_NODE, PORT))
+
+    print(f"{current_time} | Listtening on {THIS_NODE}:{PORT}")
+    
+
+    read_file(args[1])
+
+    print_status()
+
+    while True:
+        exit()
+        (data, client_addr) = server_sckt.recvfrom(1024)
 
 
 if __name__ == "__main__":
