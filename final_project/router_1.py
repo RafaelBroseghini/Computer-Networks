@@ -27,7 +27,6 @@ MESSAGES = [
 
 def read_file(filename: str) -> None:
     """Read config file"""
-    ROUTING_TABLE[THIS_NODE] = {}
 
     with open(filename, "r") as infile:
         full_table = [elem.split() for elem in infile.readlines() if elem.split() != []]
@@ -37,7 +36,8 @@ def read_file(filename: str) -> None:
                 router += 1
                 while router < len(full_table) and len(full_table[router]) != 1:
                     neighbor, cost = full_table[router][0], int(full_table[router][1])
-                    ROUTING_TABLE[THIS_NODE][neighbor] = [cost, neighbor]
+                    ROUTING_TABLE[neighbor] = [cost, neighbor]
+                    NEIGHBORS.add(neighbor)
                     router += 1
 
 def format_update():
@@ -73,8 +73,7 @@ def send_hello(msg_txt, src_node, dst_node):
 def print_status():
     """Print status"""
     print(f"{'Host':^15} {'Cost':^10} {'Via':^15}")
-    for neighbor, data in ROUTING_TABLE[THIS_NODE].items():
-        # cost, via = data[0], data[1]
+    for neighbor, data in ROUTING_TABLE.items():
         cost, via = data[0], data[1]
         print(f"{neighbor:^15} {cost:^10} {via:^15}")
 
@@ -88,7 +87,7 @@ def main(args: list):
     print(f"{current_time} | Binding on {THIS_NODE}:{PORT}")
     server_sckt.bind((THIS_NODE, PORT))
 
-    print(f"{current_time} | Listtening on {THIS_NODE}:{PORT}")
+    print(f"{current_time} | Listening on {THIS_NODE}:{PORT}")
     
 
     read_file(args[1])
