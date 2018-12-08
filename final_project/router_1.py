@@ -149,7 +149,7 @@ def main(args: list):
 
     print_status()
 
-    time.sleep(4)
+    time.sleep(6)
 
     for n in NEIGHBORS:
         send_update(n)
