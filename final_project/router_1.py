@@ -107,11 +107,11 @@ def parse_hello(msg):
     """Send the message to an appropriate next hop"""
     src  = ".".join([str(p) for p in msg[1:5]])
     dest = ".".join([str(p) for p in msg[5:9]])
-    msg  = "".join([chr(p) for p in msg[9:]])
+    data  = "".join([chr(p) for p in msg[9:]])
 
     if dest == THIS_NODE:
         current_time = time.strftime("%H:%M:%S", time.localtime())
-        print(f"{current_time} | Received {msg} from {src}")
+        print(f"{current_time} | Received {data} from {src}")
     else:
         send_hello(msg, THIS_NODE, dest)
 
@@ -177,7 +177,6 @@ def main(args: list):
                         send_update(neigh_addr)
             else:
                 parse_hello(data)
-
 
         my_choice = random.randint(0,100)
 
