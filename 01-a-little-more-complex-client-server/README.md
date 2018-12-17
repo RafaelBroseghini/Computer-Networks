@@ -1,11 +1,2 @@
-# Computer-Networks
-> Python implementations of computer networks applications.
+# Client/Server with a little more interactivity
 
-## Applications:
-* Basic Client and Server using Sockets.
-* DNS client.
-* DNS server.
-* Web Server.
-* Ping.
-* Traceroute.
-* Distance Vector protocol.
